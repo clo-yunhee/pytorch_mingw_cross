@@ -25,6 +25,7 @@ SET(WITH_BLAS "" CACHE STRING "Blas type [mkl/open/goto/acml/atlas/accelerate/ve
 # Old FindBlas
 INCLUDE(CheckCSourceRuns)
 INCLUDE(CheckFortranFunctionExists)
+INCLUDE(CheckFunctionExists)
 
 MACRO(Check_Fortran_Libraries LIBRARIES _prefix _name _flags _list)
   # This macro checks for the existence of the combination of fortran libraries
@@ -57,7 +58,9 @@ MACRO(Check_Fortran_Libraries LIBRARIES _prefix _name _flags _list)
         find_library(${_prefix}_${_library}_LIBRARY
           NAMES ${_library}
           PATHS ENV LIB
-          PATHS ENV PATH )
+          PATHS ENV PATH
+          PATHS $ENV{OpenBLAS_HOME}/lib
+          NO_CMAKE_FIND_ROOT_PATH)
       endif ( WIN32 )
       if ( APPLE )
         find_library(${_prefix}_${_library}_LIBRARY

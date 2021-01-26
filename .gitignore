@@ -1,6 +1,10 @@
 ## General
 build/
+build-w32/
+build-w64/
 __pycache__/
+sleef-native/
+protobuf-native/
 
 # Compiled Object files
 *.slo

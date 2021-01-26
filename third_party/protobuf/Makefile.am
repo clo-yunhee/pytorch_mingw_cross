@@ -9,7 +9,7 @@ AUTOMAKE_OPTIONS = foreign
 SUBDIRS = . src
 
 # Always include third_party directories in distributions.
-DIST_SUBDIRS = src conformance benchmarks third_party/googletest
+DIST_SUBDIRS = src conformance third_party/googletest
 
 # Build gmock before we build protobuf tests.  We don't add gmock to SUBDIRS
 # because then "make check" would also build and run all of gmock's own tests,
