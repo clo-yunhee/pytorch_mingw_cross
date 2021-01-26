@@ -59,6 +59,9 @@ cd $build_dir
 $cmake_command $root $cmake_args || true
 $cmake_command $root $cmake_args
 
-make -j$(nproc) torch_cpu
+make -j$(nproc) torch_cpu torch torch_global_deps
 
+cmake -DCMAKE_INSTALL_LOCAL_ONLY=TRUE -DCMAKE_INSTALL_PREFIX=$(pwd)/dist -P cmake_install.cmake
+cmake -DCMAKE_INSTALL_LOCAL_ONLY=TRUE -DCMAKE_INSTALL_PREFIX=$(pwd)/dist -P c10/cmake_install.cmake
+cmake -DCMAKE_INSTALL_LOCAL_ONLY=TRUE -DCMAKE_INSTALL_PREFIX=$(pwd)/dist -P sleef/cmake_install.cmake
 cmake -DCMAKE_INSTALL_LOCAL_ONLY=TRUE -DCMAKE_INSTALL_PREFIX=$(pwd)/dist -P caffe2/cmake_install.cmake
