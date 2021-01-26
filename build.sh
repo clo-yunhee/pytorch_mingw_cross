@@ -5,22 +5,25 @@ set -e
 root=$(pwd)
 
 mkdir -p $root/build/native
-cd $root/build/native
 
 if [ ! -d $root/sleef-native ]; then
+    cd $root/build/native
     mkdir -p sleef
     cd sleef
+    export CC= CXX=
     cmake $root/third_party/sleef -DBUILD_LIBM=OFF -DBUILD_DFT=OFF -DBUILD_QUAD=OFF -DBUILD_GNUABI_LIBS=OFF -DBUILD_TESTS=OFF
     make -j$(nproc) mkalias mkdisp mkmasked_gnuabi mkrename mkrename_gnuabi
     mkdir -p $root/sleef-native/bin
     cp -v bin/* $root/sleef-native/bin
 fi
 
-cd $root/build/native
-
 if [ ! -d $root/protobuf-native ]; then
+    cd $root/third_party/protobuf
+    sh ./autogen.sh
+    cd $root/build/native
     mkdir -p protobuf 
     cd protobuf
+    export CC= CXX=
     $root/third_party/protobuf/configure --prefix=$root/protobuf-native CFLAGS="-fuse-ld=bfd" CXXFLAGS="-fuse-ld=bfd" LDFLAGS="-Wl,-fuse-ld=bfd"
     make -j$(nproc)
     make install
