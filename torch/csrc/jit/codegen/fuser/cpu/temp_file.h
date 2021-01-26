@@ -6,8 +6,8 @@
 #include <torch/csrc/utils/disallow_copy.h>
 
 #ifdef _WIN32
-#include <WinError.h>
-#include <Windows.h>
+#include <winerror.h>
+#include <windows.h>
 #include <fcntl.h>
 #include <io.h>
 #include <process.h>
@@ -26,7 +26,7 @@ namespace jit {
 namespace fuser {
 namespace cpu {
 
-#ifdef _WIN64
+#ifdef _WIN32
 int mkstemps(char* tmpl, int suffix_len) {
   int len;
   char* name;
@@ -68,7 +68,7 @@ struct TempFile {
     std::vector<char> tt(t.c_str(), t.c_str() + t.size() + 1);
     int fd = mkstemps(tt.data(), suffix);
     AT_ASSERT(fd != -1);
-#ifdef _WIN64
+#ifdef _WIN32
     file_ = _fdopen(fd, "r+");
 #else
     file_ = fdopen(fd, "r+");
@@ -92,7 +92,7 @@ struct TempFile {
     AT_ASSERT(str.size() == result);
   }
 
-#ifdef _WIN64
+#ifdef _WIN32
   void close() {
     if (file_ != nullptr) {
       fclose(file_);
@@ -106,7 +106,7 @@ struct TempFile {
   }
 
   ~TempFile() {
-#ifdef _WIN64
+#ifdef _WIN32
     if (file_ != nullptr) {
       fclose(file_);
     }
