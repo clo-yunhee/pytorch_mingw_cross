@@ -1376,7 +1376,7 @@ if(CAFFE2_CMAKE_BUILDING_WITH_MAIN_REPO AND NOT INTERN_DISABLE_ONNX)
   # Add op schemas in "ai.onnx.pytorch" domain
   add_subdirectory("${CMAKE_CURRENT_LIST_DIR}/../caffe2/onnx/torch_ops")
   if(NOT USE_SYSTEM_ONNX)
-    add_subdirectory(${CMAKE_CURRENT_LIST_DIR}/../third_party/onnx EXCLUDE_FROM_ALL)
+      add_subdirectory(${CMAKE_CURRENT_LIST_DIR}/../third_party/onnx EXCLUDE_FROM_ALL)
   endif()
   add_subdirectory(${CMAKE_CURRENT_LIST_DIR}/../third_party/foxi EXCLUDE_FROM_ALL)
 
@@ -1408,7 +1408,10 @@ if(CAFFE2_CMAKE_BUILDING_WITH_MAIN_REPO AND NOT INTERN_DISABLE_ONNX)
     list(APPEND Caffe2_DEPENDENCY_LIBS onnx_proto onnx)
   endif()
   include_directories(${FOXI_INCLUDE_DIRS})
-  list(APPEND Caffe2_DEPENDENCY_LIBS foxi_loader)
+  
+  caffe2_interface_library(foxi_loader onnxifi_loader_library)
+  list(APPEND Caffe2_DEPENDENCY_WHOLE_LINK_LIBS onnxifi_loader_library)
+
   # Recover the build shared libs option.
   set(BUILD_SHARED_LIBS ${TEMP_BUILD_SHARED_LIBS})
 endif()

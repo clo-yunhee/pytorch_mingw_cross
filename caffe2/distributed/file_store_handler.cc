@@ -43,7 +43,7 @@ FileStoreHandler::FileStoreHandler(
   if (!prefix.empty()) {
     basePath_ = basePath_ + "/" + encodeName(prefix);
   }
-#if defined(_WIN64)
+#if defined(_WIN32)
   auto ret = mkdir(basePath_.c_str());
 #else
   auto ret = mkdir(basePath_.c_str(), 0777);
@@ -56,7 +56,7 @@ FileStoreHandler::FileStoreHandler(
 FileStoreHandler::~FileStoreHandler() {}
 
 std::string FileStoreHandler::realPath(const std::string& path) {
-#if defined(_WIN64)
+#if defined(_WIN32)
   std::array<char, _MAX_PATH> buf;
   auto ret = _fullpath(buf.data(), path.c_str(), buf.size());
 #else

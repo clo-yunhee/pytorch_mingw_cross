@@ -317,7 +317,7 @@ target_include_directories(onnx_proto PUBLIC
   $<INSTALL_INTERFACE:include>
   $<BUILD_INTERFACE:${PROTOBUF_INCLUDE_DIRS}>)
 
-if (MSVC)
+if (MSVC OR (MINGW AND WIN32))
   if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
     set(EXTRA_FLAGS
           "-Wno-implicit-function-declaration"
