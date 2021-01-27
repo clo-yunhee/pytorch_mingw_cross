@@ -80,4 +80,6 @@ for comp in libprotobuf protobuf-headers protobuf-protos protobuf-export ; do
     cmake -DCMAKE_INSTALL_COMPONENT=$comp -DCMAKE_INSTALL_PREFIX=$(pwd)/dist -P third_party/protobuf/cmake/cmake_install.cmake
 done
 
+cp -rv $blas_dir/* $(pwd)/dist
+
 tar -czvf libtorch-$pkg_suffix.tar.gz --transform 's/^dist/libtorch/' dist/
