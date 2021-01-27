@@ -45,11 +45,11 @@ else
     case "$HOST" in
         i686-w64-mingw32)
             toolchain=/usr/win32-toolchain.cmake
-            pkg_suffix=x64
+            pkg_suffix=x86
             ;;
         x86_64-w64-mingw32)
             toolchain=/usr/win64-toolchain.cmake
-            pkg_suffix=x86
+            pkg_suffix=x64
             ;;
     esac
     blas_dir=$root/third_party/openblas/$HOST
