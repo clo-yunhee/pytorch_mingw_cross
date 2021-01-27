@@ -30,34 +30,49 @@ if [ ! -d $root/protobuf-native ]; then
 fi
 
 if [ x$MXE != x ]; then
-    if [ x$1 = x64 ]; then
-        blas_dir=$root/third_party/openblas/x86_64-w64-mingw32
-        build_dir=$root/build/x86_64-w64-mingw32
-        cmake_command=x86_64-w64-mingw32.shared-cmake
-        pkg_suffix=x64
-    else
-        blas_dir=$root/third_party/openblas/i686-w64-mingw32
-        build_dir=$root/build/i686-w64-mingw32
-        cmake_command=i686-w64-mingw32.shared-cmake
-        pkg_suffix=x86
-    fi
+    bits=${1:-32}
 else
     case "$HOST" in
-        i686-w64-mingw32)
-            toolchain=/usr/win32-toolchain.cmake
-            pkg_suffix=x86
-            ;;
-        x86_64-w64-mingw32)
-            toolchain=/usr/win64-toolchain.cmake
-            pkg_suffix=x64
-            ;;
+    *i686*)   bits=32 ;;
+    *x86_64*) bits=64 ;;
     esac
-    blas_dir=$root/third_party/openblas/$HOST
-    build_dir=$root/build/$HOST
-    cmake_command="cmake -DCMAKE_TOOLCHAIN_FILE=$toolchain"
 fi
 
-export OpenBLAS_HOME=$blas_dir
+if [ x$bits = x32 ]; then
+    target=i686-w64-mingw32
+    build_dir=$root/build/$target
+    blas_arch=x86
+    pkg_suffix=x86
+elif [ x$bits = x64 ]; then
+    target=x86_64-w64-mingw32
+    build_dir=$root/build/$target
+    blas_arch=x86_64
+    pkg_suffix=x64
+else
+    echo "Bits should be 32 or 64!" >&2
+    exit 1
+fi
+
+if [ x$MXE != x ]; then
+    cmake_command=$target.shared-cmake
+    cross_fc=$target.shared-gfortran
+    cross_cc=$target.shared-gcc
+else
+    cmake_command="cmake -DCMAKE_TOOLCHAIN_FILE=/usr/win$bits-toolchain.cmake"
+    cross_fc=$target-gfortran-posix
+    cross_cc=$target-gcc-posix
+fi
+
+if [ ! -d $build_dir/openblas_build ]; then
+    mkdir -p $build_dir/openblas
+    cd $build_dir/openblas
+    cp -r $root/third_party/openblas/* .
+    make_flags="FC=$cross_fc CC=$cross_cc HOSTCC=gcc MAKE_NB_JOBS=-1 CROSS=1 BUILD_RELAPACK=0 USE_THREAD=0 TARGET=CORE2 DYNAMIC_ARCH=1 ARCH=$blas_arch BINARY=$bits NO_STATIC=1 PREFIX=$build_dir/openblas_build"
+    make $make_flags -j$(nproc)
+    make $make_flags install
+fi
+
+export OpenBLAS_HOME=$build_dir/openblas_build
 
 cmake_args="-DNATIVE_BUILD_DIR=$root/sleef-native -DCAFFE2_CUSTOM_PROTOC_EXECUTABLE=$root/protobuf-native/bin/protoc -DWITH_BLAS=open -DGLIBCXX_USE_CXX11_ABI=1 -DCMAKE_C_FLAGS=-D_WIN32_WINNT=_WIN32_WINNT_WIN7 -DCMAKE_CXX_FLAGS=-D_WIN32_WINNT=_WIN32_WINNT_WIN7"
 
@@ -80,6 +95,6 @@ for comp in libprotobuf protobuf-headers protobuf-protos protobuf-export ; do
     cmake -DCMAKE_INSTALL_COMPONENT=$comp -DCMAKE_INSTALL_PREFIX=$(pwd)/dist -P third_party/protobuf/cmake/cmake_install.cmake
 done
 
-cp -rv $blas_dir/* $(pwd)/dist
+cp -rv $build_dir/openblas_build/* $(pwd)/dist
 
 tar -czvf libtorch-$pkg_suffix.tar.gz --transform 's/^dist/libtorch/' dist/
