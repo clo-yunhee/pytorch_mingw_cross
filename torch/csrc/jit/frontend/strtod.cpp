@@ -74,7 +74,7 @@ double parse_inf_or_nan(const char* p, char** endptr) {
 namespace torch {
 namespace jit {
 
-#ifdef _WIN64
+#ifdef _WIN32
 C10_EXPORT double strtod_c(const char* nptr, char** endptr) {
   static _locale_t loc = _create_locale(LC_ALL, "C");
   return _strtod_l(nptr, endptr, loc);
